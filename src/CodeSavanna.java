@@ -1,9 +1,11 @@
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class CodeSavanna {
-    public static void menuCliente
 
-    {
+    public static void menuCliente(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) throws FileNotFoundException {
 
         Scanner input = new Scanner(System.in);
 
@@ -12,10 +14,10 @@ public class CodeSavanna {
         do {
 
             System.out.println("\n\n-===== MENU CLIENTE CODE SAVANNA+ =====");
-            System.out.println("1. Ver catálogo de animais por habitat");
-            System.out.println("2. Ver atividades de um animal (espetáculos e alimentações");
+            System.out.println("1. Ver catalogo de animais por habitat");
+            System.out.println("2. Ver atividades de um animal (espetáculos e alimentaçoes");
             System.out.println("3. Simular apadrinhamento de um animal");
-            System.out.println("4. Jogo: adivinha a espécie");
+            System.out.println("4. Jogo: adivinha a especie");
             System.out.println("0. Voltar");
 
             System.out.print("Opção: ");
@@ -24,6 +26,7 @@ public class CodeSavanna {
             switch (opcao) {
 
                 case 1: // Ver catálogo de animais por habitat
+                    catalogoAnimaisHabitat(caminhoAnimais);
                     break;
 
                 case 2: // Ver atividades de um animal (espetáculos e alimentações
@@ -47,7 +50,28 @@ public class CodeSavanna {
 
     }
 
-    public static void menuAdmin() {
+    public static void catalogoAnimaisHabitat(String caminhoAnimais) throws FileNotFoundException {
+        File animais = new File(caminhoAnimais);
+        Scanner scanner = new Scanner(animais);
+
+        // Lê e ignora o cabeçalho (primeira linha)
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
+        while (scanner.hasNextLine()) {
+            String linha = scanner.nextLine();
+            String[] colunas = linha.split(";");
+
+            // Formato: id, nome, especie, habitat,dieta,perigoExtinção
+            String nome = colunas[1];
+            String habitat = colunas[3];
+
+            System.out.println("Nome: " + nome + " | Habitat: " + habitat);
+        }
+        scanner.close();
+    }
+
+    public static void menuAdmin(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) {
         Scanner input = new Scanner(System.in);
 
         int opcao;
@@ -104,7 +128,7 @@ public class CodeSavanna {
         } while (opcao != 0);
     }
 
-    public static void menuLogin() {
+    public static void menuLogin(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) throws FileNotFoundException {
 
         Scanner input = new Scanner(System.in);
 
@@ -133,7 +157,7 @@ public class CodeSavanna {
 
                     if (username.equals("admin") && password.equals("code")) {
                         // Login válido
-                        menuAdmin();
+                        menuAdmin(caminhoClientes,caminhoAnimais, caminhoInteracoes);
                     } else {
                         System.out.println("Login incorreto");
                     }
@@ -141,7 +165,7 @@ public class CodeSavanna {
                     break;
 
                 case 2: // CLIENTE
-                    menuCliente();
+                    menuCliente(caminhoClientes, caminhoAnimais, caminhoInteracoes);
                     break;
 
                 case 0: // SAIR
@@ -157,8 +181,15 @@ public class CodeSavanna {
     }
 
 
-    public static void main(String[] args) {
-        menuLogin();
+    public static void main() throws FileNotFoundException {
+        String caminhoAnimais = "files/animais.csv";
+        String caminhoClientes = "files/clientes.csv";
+        String caminhoInteracoes = "files/interacoes.csv";
+
+        //Ler files
+
+        menuLogin(caminhoClientes, caminhoAnimais, caminhoInteracoes);
+
     }
 }
 
