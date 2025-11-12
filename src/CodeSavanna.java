@@ -1,7 +1,6 @@
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 public class CodeSavanna {
 
@@ -64,9 +63,12 @@ public class CodeSavanna {
 
             // Formato: id, nome, especie, habitat,dieta,perigoExtinção
             String nome = colunas[1];
+            String especie = colunas[2];
             String habitat = colunas[3];
 
-            System.out.println("Nome: " + nome + " | Habitat: " + habitat);
+            System.out.println("***" + habitat + "***");
+            System.out.println("- " + nome + "(" + especie + ")");
+
         }
         scanner.close();
     }
@@ -181,12 +183,11 @@ public class CodeSavanna {
     }
 
 
-    public static void main() throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException {
         String caminhoAnimais = "files/animais.csv";
         String caminhoClientes = "files/clientes.csv";
         String caminhoInteracoes = "files/interacoes.csv";
 
-        //Ler files
 
         menuLogin(caminhoClientes, caminhoAnimais, caminhoInteracoes);
 
