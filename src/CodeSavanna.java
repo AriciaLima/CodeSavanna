@@ -194,7 +194,6 @@ public class CodeSavanna {
     }
 
     // ========================== SIMULAR APADRINHAMENTO ==========================
-    // ========================== SIMULAR APADRINHAMENTO ==========================
     public static void simularApadrinhamento(String[][] matrizAnimais, Scanner input) {
 
         input.nextLine();
