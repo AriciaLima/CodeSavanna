@@ -1,20 +1,18 @@
 import java.util.Scanner;
-import java.io.File;
 import java.io.FileNotFoundException;
 
 public class CodeSavanna {
 
-    public static void menuCliente(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) throws FileNotFoundException {
+    // ============================== MENU CLIENTE ==============================
+    public static void menuCliente(String[][] matrizClientes, String[][] matrizAnimais, String[][] matrizInteracoes) {
 
         Scanner input = new Scanner(System.in);
-
         int opcao;
 
         do {
-
             System.out.println("\n\n-===== MENU CLIENTE CODE SAVANNA+ =====");
-            System.out.println("1. Ver catalogo de animais por habitat");
-            System.out.println("2. Ver atividades de um animal (espetáculos e alimentações)");
+            System.out.println("1. Ver catálogo de animais por habitat");
+            System.out.println("2. Ver atividades de um animal");
             System.out.println("3. Simular apadrinhamento de um animal");
             System.out.println("4. Jogo: adivinha a especial");
             System.out.println("0. Voltar");
@@ -24,20 +22,22 @@ public class CodeSavanna {
 
             switch (opcao) {
 
-                case 1: // Ver catálogo de animais por habitat
-                    catalogoAnimaisHabitat(caminhoAnimais);
+                case 1:
+                    catalogoAnimaisHabitat(matrizAnimais);
                     break;
 
-                case 2: // Ver atividades de um animal (espetáculos e alimentações
+                case 2:
+                    verAtividadesAnimal(matrizAnimais, matrizInteracoes, input);
                     break;
 
-                case 3: // Simular apadrinhamento de um animal
+                case 3:
+                    simularApadrinhamento(matrizAnimais, input);
                     break;
 
-                case 4: // Encontrar amigos de zoo
+                case 4:
                     break;
 
-                case 0: // Voltar
+                case 0:
                     break;
 
                 default:
@@ -46,58 +46,30 @@ public class CodeSavanna {
             }
 
         } while (opcao != 0);
-
     }
 
-    public static void catalogoAnimaisHabitat(String caminhoAnimais) throws FileNotFoundException {
+    // ======================= CATÁLOGO DE ANIMAIS POR HABITAT =======================
+    public static void catalogoAnimaisHabitat(String[][] matrizAnimais) {
 
-        File arquivo = new File(caminhoAnimais);
-
-        // 1) Primeira leitura: contar registos válidos
-        Scanner scanner = new Scanner(arquivo);
-
-        if (scanner.hasNextLine()) scanner.nextLine(); // ignora cabeçalho
-
-        int total = 0;
-        while (scanner.hasNextLine()) {
-            String[] colunas = scanner.nextLine().split(";");
-            if (colunas.length >= 4) total++;
-        }
-        scanner.close();
-
-        // 2) Segunda leitura: carregar dados nos arrays
-        scanner = new Scanner(arquivo);
-
-        if (scanner.hasNextLine()) scanner.nextLine(); // ignora cabeçalho
-
+        int total = matrizAnimais.length;
         String[] nomes = new String[total];
         String[] especies = new String[total];
         String[] habitats = new String[total];
 
-        int index = 0;
-
-        while (scanner.hasNextLine() && index < total) {
-            String[] colunas = scanner.nextLine().split(";");
-            if (colunas.length >= 4) {
-                nomes[index] = colunas[1].trim();
-                especies[index] = colunas[2].trim();
-                habitats[index] = colunas[3].trim();
-                index++;
-            }
+        for (int i = 0; i < total; i++) {
+            nomes[i] = matrizAnimais[i][1];
+            especies[i] = matrizAnimais[i][2];
+            habitats[i] = matrizAnimais[i][3];
         }
-        scanner.close();
 
-        // 3) Ordenar pelo habitat (bubble sort)
         for (int i = 0; i < total - 1; i++) {
             for (int j = 0; j < total - 1 - i; j++) {
                 if (habitats[j].compareTo(habitats[j + 1]) > 0) {
 
-                    // troca habitat
                     String tempHab = habitats[j];
                     habitats[j] = habitats[j + 1];
                     habitats[j + 1] = tempHab;
 
-                    // mantém arrays sincronizados
                     String tempNome = nomes[j];
                     nomes[j] = nomes[j + 1];
                     nomes[j + 1] = tempNome;
@@ -109,15 +81,13 @@ public class CodeSavanna {
             }
         }
 
-        // 4) Imprimir agrupado por habitat
         String habitatAtual = "";
         boolean primeiro = true;
 
         for (int i = 0; i < total; i++) {
-            String habitat = habitats[i];
 
-            if (primeiro || !habitat.equals(habitatAtual)) {
-                habitatAtual = habitat;
+            if (primeiro || !habitats[i].equals(habitatAtual)) {
+                habitatAtual = habitats[i];
                 System.out.println("\n*** " + habitatAtual + " ***");
                 primeiro = false;
             }
@@ -126,17 +96,164 @@ public class CodeSavanna {
         }
     }
 
+    // ====================== ATIVIDADES (ESPETÁCULOS / ALIMENTAÇÕES) ======================
+    public static void verAtividadesAnimal(String[][] matrizAnimais, String[][] matrizInteracoes, Scanner input) {
 
+        System.out.print("\nId do animal (ex: A01): ");
+        String idAnimalProcurado = input.next();
 
-    public static void menuAdmin(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) {
+        String nomeAnimal = null;
+        String especieAnimal = null;
+
+        for (int i = 0; i < matrizAnimais.length; i++) {
+            if (matrizAnimais[i][0].equalsIgnoreCase(idAnimalProcurado)) {
+                nomeAnimal = matrizAnimais[i][1];
+                especieAnimal = matrizAnimais[i][2];
+                break;
+            }
+        }
+
+        if (nomeAnimal == null) {
+            System.out.println("\nNão existe nenhum animal com o id " + idAnimalProcurado + ".");
+            return;
+        }
+
+        System.out.println("\nAtividades do animal " + nomeAnimal + " (" + especieAnimal + "):\n");
+
+        String[] nomesEspetaculos = new String[matrizInteracoes.length];
+        int[] contagensEspetaculos = new int[matrizInteracoes.length];
+        int qtdEspetaculos = 0;
+
+        String[] nomesAlimentacoes = new String[matrizInteracoes.length];
+        int[] contagensAlimentacoes = new int[matrizInteracoes.length];
+        int qtdAlimentacoes = 0;
+
+        for (int i = 0; i < matrizInteracoes.length; i++) {
+
+            if (matrizInteracoes[i][3].equalsIgnoreCase(idAnimalProcurado)) {
+
+                String tipo = matrizInteracoes[i][1];
+                String nomeEvento = matrizInteracoes[i][2];
+
+                if (tipo.equalsIgnoreCase("ESPETACULO")) {
+
+                    int pos = -1;
+                    for (int j = 0; j < qtdEspetaculos; j++) {
+                        if (nomesEspetaculos[j].equalsIgnoreCase(nomeEvento)) {
+                            pos = j;
+                            break;
+                        }
+                    }
+
+                    if (pos == -1) {
+                        nomesEspetaculos[qtdEspetaculos] = nomeEvento;
+                        contagensEspetaculos[qtdEspetaculos] = 1;
+                        qtdEspetaculos++;
+                    } else {
+                        contagensEspetaculos[pos]++;
+                    }
+
+                } else if (tipo.equalsIgnoreCase("ALIMENTACAO")) {
+
+                    int pos = -1;
+                    for (int j = 0; j < qtdAlimentacoes; j++) {
+                        if (nomesAlimentacoes[j].equalsIgnoreCase(nomeEvento)) {
+                            pos = j;
+                            break;
+                        }
+                    }
+
+                    if (pos == -1) {
+                        nomesAlimentacoes[qtdAlimentacoes] = nomeEvento;
+                        contagensAlimentacoes[qtdAlimentacoes] = 1;
+                        qtdAlimentacoes++;
+                    } else {
+                        contagensAlimentacoes[pos]++;
+                    }
+                }
+            }
+        }
+
+        System.out.println("ESPETÁCULOS:");
+        if (qtdEspetaculos == 0) {
+            System.out.println("- (sem registos)");
+        } else {
+            for (int i = 0; i < qtdEspetaculos; i++) {
+                System.out.println("- " + nomesEspetaculos[i] + " (" + contagensEspetaculos[i] + " vezes)");
+            }
+        }
+
+        System.out.println("\nALIMENTAÇÕES:");
+        if (qtdAlimentacoes == 0) {
+            System.out.println("- (sem registos)");
+        } else {
+            for (int i = 0; i < qtdAlimentacoes; i++) {
+                System.out.println("- " + nomesAlimentacoes[i] + " (" + contagensAlimentacoes[i] + " vezes)");
+            }
+        }
+    }
+
+    // ========================== SIMULAR APADRINHAMENTO ==========================
+    public static void simularApadrinhamento(String[][] matrizAnimais, Scanner input) {
+
+        input.nextLine();
+
+        System.out.print("\nNome do cliente: ");
+        String nomeCliente = input.nextLine();
+
+        System.out.print("Email: ");
+        String email = input.nextLine();
+
+        System.out.print("Id do animal (ex: A01): ");
+        String idAnimalProcurado = input.nextLine();
+
+        String nomeAnimal = null;
+        String especieAnimal = null;
+        String habitatAnimal = null;
+
+        for (int i = 0; i < matrizAnimais.length; i++) {
+            if (matrizAnimais[i][0].equalsIgnoreCase(idAnimalProcurado)) {
+                nomeAnimal = matrizAnimais[i][1];
+                especieAnimal = matrizAnimais[i][2];
+                habitatAnimal = matrizAnimais[i][3];
+                break;
+            }
+        }
+
+        if (nomeAnimal == null) {
+            System.out.println("\nNão existe nenhum animal com o id " + idAnimalProcurado + ".");
+            return;
+        }
+
+        System.out.print("Valor mensal que pretende pagar (€): ");
+        double valorMensal = input.nextDouble();
+
+        String plano;
+        if (valorMensal <= 25.0) {
+            plano = "Apadrinhamento Simples";
+        } else if (valorMensal <= 50.0) {
+            plano = "Apadrinhamento Gold";
+        } else {
+            plano = "Apadrinhamento Diamond";
+        }
+
+        System.out.println("\nResumo do Apadrinhamento:\n");
+        System.out.println("Padrinho : " + nomeCliente + " (" + email + ")");
+        System.out.println("Animal   : " + nomeAnimal + " (" + especieAnimal + ") - " + habitatAnimal);
+        System.out.println("Plano    : " + plano);
+        System.out.printf("Valor    : %.2f €/mês%n", valorMensal);
+    }
+
+    // ============================== MENU ADMIN ==============================
+    public static void menuAdmin(String[][] matrizClientes, String[][] matrizAnimais, String[][] matrizInteracoes) {
+
         Scanner input = new Scanner(System.in);
-
         int opcao;
 
         do {
 
             System.out.println("\n\n-*-*-*-*-*- MENU ADMIN CODESAVANNA-*-*-*-*-*-");
-            System.out.println("1. Listar conteúdo dos ficheiro");
+            System.out.println("1. Listar conteúdo dos ficheiros");
             System.out.println("2. Estatísticas gerais de interações");
             System.out.println("3. Receita total por tipo de interação");
             System.out.println("4. Animal mais popular");
@@ -152,29 +269,34 @@ public class CodeSavanna {
 
             switch (opcao) {
 
-                case 1: // Listar conteúdo dos ficheiro
+                case 1:
                     break;
 
-                case 2: // Estatísticas gerais de interações
+                case 2:
                     break;
 
-                case 3: // Receita total por tipo de interação
+                case 3:
                     break;
 
-                case 4: // Animal mais popular
+                case 4:
                     break;
 
-                case 5: // Top 3 espécies com mais apadrinhamentos
+                case 5:
                     break;
-                case 6: // Listar padrinhos de um animal
+
+                case 6:
                     break;
-                case 7: // Espetáculo mais rentável
+
+                case 7:
                     break;
-                case 8: // Ranking de animais em perigo de extinção
+
+                case 8:
                     break;
-                case 9: // Estatísticas por habitat
+
+                case 9:
                     break;
-                case 0: // Voltar
+
+                case 0:
                     break;
 
                 default:
@@ -185,7 +307,8 @@ public class CodeSavanna {
         } while (opcao != 0);
     }
 
-    public static void menuLogin(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) throws FileNotFoundException {
+    // ============================== MENU LOGIN ==============================
+    public static void menuLogin(String[][] matrizClientes, String[][] matrizAnimais, String[][] matrizInteracoes) {
 
         Scanner input = new Scanner(System.in);
 
@@ -204,8 +327,7 @@ public class CodeSavanna {
 
             switch (opcaoLogin) {
 
-                case 1: // ADMIN
-
+                case 1:
                     System.out.print("\nUsername: ");
                     username = input.next();
 
@@ -213,19 +335,17 @@ public class CodeSavanna {
                     password = input.next();
 
                     if (username.equals("admin") && password.equals("code")) {
-                        // Login válido
-                        menuAdmin(caminhoClientes,caminhoAnimais, caminhoInteracoes);
+                        menuAdmin(matrizClientes, matrizAnimais, matrizInteracoes);
                     } else {
                         System.out.println("Login incorreto");
                     }
-
                     break;
 
-                case 2: // CLIENTE
-                    menuCliente(caminhoClientes, caminhoAnimais, caminhoInteracoes);
+                case 2:
+                    menuCliente(matrizClientes, matrizAnimais, matrizInteracoes);
                     break;
 
-                case 0: // SAIR
+                case 0:
                     System.out.println("\nObrigado! Volte sempre...");
                     break;
 
@@ -237,19 +357,17 @@ public class CodeSavanna {
         } while (opcaoLogin != 0);
     }
 
-
+    // ============================== MAIN ==============================
     public static void main(String[] args) throws FileNotFoundException {
+
         String caminhoAnimais = "files/animais.csv";
         String caminhoClientes = "files/clientes.csv";
         String caminhoInteracoes = "files/interacoes.csv";
 
+        String[][] matrizAnimais = UtilCSV.ficheiroParaMatriz(caminhoAnimais);
+        String[][] matrizClientes = UtilCSV.ficheiroParaMatriz(caminhoClientes);
+        String[][] matrizInteracoes = UtilCSV.ficheiroParaMatriz(caminhoInteracoes);
 
-        menuLogin(caminhoClientes, caminhoAnimais, caminhoInteracoes);
-
+        menuLogin(matrizClientes, matrizAnimais, matrizInteracoes);
     }
 }
-
-
-
-
-
