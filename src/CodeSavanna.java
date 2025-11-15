@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.io.FileNotFoundException;
+import java.io.File;
 
 public class CodeSavanna {
 
@@ -14,7 +15,7 @@ public class CodeSavanna {
             System.out.println("1. Ver catálogo de animais por habitat");
             System.out.println("2. Ver atividades de um animal");
             System.out.println("3. Simular apadrinhamento de um animal");
-            System.out.println("4. Jogo: adivinha a especial");
+            System.out.println("4. Jogo: adivinha a espécie");
             System.out.println("0. Voltar");
 
             System.out.print("Opção: ");
@@ -35,6 +36,7 @@ public class CodeSavanna {
                     break;
 
                 case 4:
+                    jogoAdivinhaEspecie(matrizAnimais, input);
                     break;
 
                 case 0:
@@ -244,6 +246,47 @@ public class CodeSavanna {
         System.out.printf("Valor    : %.2f €/mês%n", valorMensal);
     }
 
+    // ============================== JOGO ADIVINHA A ESPÉCIE ==============================
+    public static void jogoAdivinhaEspecie(String[][] matrizAnimais, Scanner input) {
+
+        int total = matrizAnimais.length;
+        int indiceSorteado = (int) (Math.random() * total);
+
+        String especieCorreta = matrizAnimais[indiceSorteado][2];
+        String habitat = matrizAnimais[indiceSorteado][3];
+
+        // ajusta estes índices se o teu CSV tiver outra ordem:
+        String dieta = matrizAnimais[indiceSorteado][4];        // tipo de dieta
+        String perigo = matrizAnimais[indiceSorteado][5];       // está em perigo (ex.: "SIM"/"NAO")
+
+        System.out.println("\nPISTA 1: Habitat -> " + habitat);
+        System.out.println("PISTA 2: Dieta   -> " + dieta);
+        if (perigo.equalsIgnoreCase("SIM")) {
+            System.out.println("PISTA 3: Está em perigo de extinção");
+        } else {
+            System.out.println("PISTA 3: Não está em perigo de extinção");
+        }
+
+        input.nextLine(); // limpar buffer do nextInt do menu
+
+        int tentativas = 0;
+        String palpite;
+
+        do {
+            System.out.print("\nQual é a espécie? ");
+            palpite = input.nextLine();
+            tentativas++;
+
+            if (!palpite.equalsIgnoreCase(especieCorreta)) {
+                System.out.println("Não é essa espécie. Tenta novamente.");
+            }
+
+        } while (!palpite.equalsIgnoreCase(especieCorreta));
+
+        System.out.println("\nAcertou! A espécie era " + especieCorreta + ".");
+        System.out.println("Número de tentativas: " + tentativas);
+    }
+
     // ============================== MENU ADMIN ==============================
     public static void menuAdmin(String[][] matrizClientes, String[][] matrizAnimais, String[][] matrizInteracoes) {
 
@@ -357,6 +400,19 @@ public class CodeSavanna {
         } while (opcaoLogin != 0);
     }
 
+    // ============================== COPYRIGHT ==============================
+    public static void imprimirCopyright() throws FileNotFoundException {
+
+        File ficheiro = new File("files/copyright.txt");
+        Scanner sc = new Scanner(ficheiro);
+
+        while (sc.hasNextLine()) {
+            System.out.println(sc.nextLine());
+        }
+
+        sc.close();
+    }
+
     // ============================== MAIN ==============================
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -369,5 +425,8 @@ public class CodeSavanna {
         String[][] matrizInteracoes = UtilCSV.ficheiroParaMatriz(caminhoInteracoes);
 
         menuLogin(matrizClientes, matrizAnimais, matrizInteracoes);
+
+        // após o utilizador terminar (ADMIN ou CLIENTE), imprime o copyright
+        imprimirCopyright();
     }
 }
