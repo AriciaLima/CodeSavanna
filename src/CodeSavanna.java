@@ -14,9 +14,9 @@ public class CodeSavanna {
 
             System.out.println("\n\n-===== MENU CLIENTE CODE SAVANNA+ =====");
             System.out.println("1. Ver catalogo de animais por habitat");
-            System.out.println("2. Ver atividades de um animal (espetáculos e alimentaçoes");
+            System.out.println("2. Ver atividades de um animal (espetáculos e alimentações)");
             System.out.println("3. Simular apadrinhamento de um animal");
-            System.out.println("4. Jogo: adivinha a especie");
+            System.out.println("4. Jogo: adivinha a especial");
             System.out.println("0. Voltar");
 
             System.out.print("Opção: ");
@@ -50,28 +50,83 @@ public class CodeSavanna {
     }
 
     public static void catalogoAnimaisHabitat(String caminhoAnimais) throws FileNotFoundException {
-        File animais = new File(caminhoAnimais);
-        Scanner scanner = new Scanner(animais);
 
-        // Lê e ignora o cabeçalho (primeira linha)
-        if (scanner.hasNextLine()) {
-            scanner.nextLine();
-        }
+        File arquivo = new File(caminhoAnimais);
+
+        // 1) Primeira leitura: contar registos válidos
+        Scanner scanner = new Scanner(arquivo);
+
+        if (scanner.hasNextLine()) scanner.nextLine(); // ignora cabeçalho
+
+        int total = 0;
         while (scanner.hasNextLine()) {
-            String linha = scanner.nextLine();
-            String[] colunas = linha.split(";");
-
-            // Formato: id, nome, especie, habitat,dieta,perigoExtinção
-            String nome = colunas[1];
-            String especie = colunas[2];
-            String habitat = colunas[3];
-
-            System.out.println("***" + habitat + "***");
-            System.out.println("- " + nome + "(" + especie + ")");
-
+            String[] colunas = scanner.nextLine().split(";");
+            if (colunas.length >= 4) total++;
         }
         scanner.close();
+
+        // 2) Segunda leitura: carregar dados nos arrays
+        scanner = new Scanner(arquivo);
+
+        if (scanner.hasNextLine()) scanner.nextLine(); // ignora cabeçalho
+
+        String[] nomes = new String[total];
+        String[] especies = new String[total];
+        String[] habitats = new String[total];
+
+        int index = 0;
+
+        while (scanner.hasNextLine() && index < total) {
+            String[] colunas = scanner.nextLine().split(";");
+            if (colunas.length >= 4) {
+                nomes[index] = colunas[1].trim();
+                especies[index] = colunas[2].trim();
+                habitats[index] = colunas[3].trim();
+                index++;
+            }
+        }
+        scanner.close();
+
+        // 3) Ordenar pelo habitat (bubble sort)
+        for (int i = 0; i < total - 1; i++) {
+            for (int j = 0; j < total - 1 - i; j++) {
+                if (habitats[j].compareTo(habitats[j + 1]) > 0) {
+
+                    // troca habitat
+                    String tempHab = habitats[j];
+                    habitats[j] = habitats[j + 1];
+                    habitats[j + 1] = tempHab;
+
+                    // mantém arrays sincronizados
+                    String tempNome = nomes[j];
+                    nomes[j] = nomes[j + 1];
+                    nomes[j + 1] = tempNome;
+
+                    String tempEsp = especies[j];
+                    especies[j] = especies[j + 1];
+                    especies[j + 1] = tempEsp;
+                }
+            }
+        }
+
+        // 4) Imprimir agrupado por habitat
+        String habitatAtual = "";
+        boolean primeiro = true;
+
+        for (int i = 0; i < total; i++) {
+            String habitat = habitats[i];
+
+            if (primeiro || !habitat.equals(habitatAtual)) {
+                habitatAtual = habitat;
+                System.out.println("\n*** " + habitatAtual + " ***");
+                primeiro = false;
+            }
+
+            System.out.println("- " + nomes[i] + " (" + especies[i] + ")");
+        }
     }
+
+
 
     public static void menuAdmin(String caminhoClientes, String caminhoAnimais, String caminhoInteracoes) {
         Scanner input = new Scanner(System.in);
