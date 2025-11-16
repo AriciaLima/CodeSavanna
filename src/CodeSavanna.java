@@ -313,33 +313,36 @@ public class CodeSavanna {
             switch (opcao) {
 
                 case 1:
+                    listarConteudoFicheiros(matrizClientes, matrizAnimais, matrizInteracoes, input);
                     break;
 
                 case 2:
+                    estatisticasGeraisInteracoes(matrizInteracoes);
                     break;
 
                 case 3:
+                    receitaPorTipoInteracao(matrizInteracoes);
                     break;
 
-                case 4:
+                case 4://4. Animal mais popular
                     break;
 
-                case 5:
+                case 5://5. Top 3 espécies com mais apadrinhamentos
                     break;
 
-                case 6:
+                case 6://6. Listar padrinhos de um animal
                     break;
 
-                case 7:
+                case 7://7. Espetáculo mais rentável
                     break;
 
-                case 8:
+                case 8://8. Ranking de animais em perigo de extinção
                     break;
 
-                case 9:
+                case 9://9. Estatísticas por habitat
                     break;
 
-                case 0:
+                case 0://0. Voltar
                     break;
 
                 default:
@@ -348,6 +351,120 @@ public class CodeSavanna {
             }
 
         } while (opcao != 0);
+    }
+
+    // ======================= ADMIN 1 - LISTAR FICHEIROS =======================
+    public static void listarConteudoFicheiros(String[][] matrizClientes, String[][] matrizAnimais, String[][] matrizInteracoes, Scanner input) {
+
+        System.out.println("\n1 - Animais");
+        System.out.println("2 - Clientes");
+        System.out.println("3 - Interações");
+        System.out.print("Escolha: ");
+        int escolha = input.nextInt();
+
+        switch (escolha) {
+
+            case 1:
+                UtilTable.imprimirTabela("FICHEIRO: ANIMAIS", new String[]{"ID", "Nome", "Espécie", "Habitat", "Dieta", "Perigo"}, matrizAnimais, 6);
+                break;
+
+            case 2:
+                UtilTable.imprimirTabela("FICHEIRO: CLIENTES", new String[]{"ID", "Nome", "Email"}, matrizClientes, 3);
+                break;
+
+            case 3:
+                UtilTable.imprimirTabela("FICHEIRO: INTERAÇÕES", new String[]{"ID", "Tipo", "Evento", "IdAnimal", "IdCliente", "Valor"}, matrizInteracoes, 6);
+                break;
+
+            default:
+                System.out.println("Opção inválida.");
+        }
+    }
+
+    // ======================= ADMIN 2 - ESTATÍSTICAS GERAIS =======================
+    public static void estatisticasGeraisInteracoes(String[][] matrizInteracoes) {
+
+        int total = matrizInteracoes.length;
+
+        int visitas = 0;
+        int espetaculos = 0;
+        int alimentacoes = 0;
+        int apadrinhamentos = 0;
+
+        for (int i = 0; i < total; i++) {
+
+            String tipo = matrizInteracoes[i][2].toUpperCase();  // COLUNA CORRETA
+
+            switch (tipo) {
+                case "VISITA":
+                    visitas++;
+                    break;
+
+                case "ESPETACULO":
+                    espetaculos++;
+                    break;
+
+                case "ALIMENTACAO":
+                    alimentacoes++;
+                    break;
+
+                case "APADRINHAMENTO":
+                    apadrinhamentos++;
+                    break;
+            }
+        }
+
+        System.out.println("\n================ ESTATÍSTICAS DE INTERAÇÕES ================");
+        System.out.printf("Total de interações : %d%n", total);
+        System.out.printf("VISITA              : %d%n", visitas);
+        System.out.printf("ESPETACULO          : %d%n", espetaculos);
+        System.out.printf("ALIMENTACAO         : %d%n", alimentacoes);
+        System.out.printf("APADRINHAMENTO      : %d%n", apadrinhamentos);
+        System.out.println("============================================================\n");
+    }
+
+    // ======================= ADMIN 3 - Receitas por tipo interaçao =======================
+    public static void receitaPorTipoInteracao(String[][] matrizInteracoes) {
+
+        double totalVisita = 0;
+        double totalEspetaculo = 0;
+        double totalAlimentacao = 0;
+        double totalApadrinhamento = 0;
+
+        for (int i = 0; i < matrizInteracoes.length; i++) {
+
+            String tipo = matrizInteracoes[i][2].trim().toUpperCase(); // tipoInteracao
+            double valor = Double.parseDouble(matrizInteracoes[i][5].trim()); // valorPago
+
+            switch (tipo) {
+                case "VISITA":
+                    totalVisita += valor;
+                    break;
+
+                case "ESPETACULO":
+                    totalEspetaculo += valor;
+                    break;
+
+                case "ALIMENTACAO":
+                    totalAlimentacao += valor;
+                    break;
+
+                case "APADRINHAMENTO":
+                    totalApadrinhamento += valor;
+                    break;
+            }
+        }
+
+        double totalGlobal = totalVisita + totalEspetaculo + totalAlimentacao + totalApadrinhamento;
+
+        System.out.println("\n=========== RECEITA TOTAL POR TIPO DE INTERAÇÃO ===========");
+        System.out.printf("VISITA         : %.2f €%n", totalVisita);
+        System.out.printf("ESPETACULO     : %.2f €%n", totalEspetaculo);
+        System.out.printf("ALIMENTACAO    : %.2f €%n", totalAlimentacao);
+        System.out.printf("APADRINHAMENTO : %.2f €%n", totalApadrinhamento);
+        System.out.println("------------------------------------------------------------");
+        System.out.printf("TOTAL GLOBAL   : %.2f €%n", totalGlobal);
+        System.out.println("============================================================\n");
     }
 
     // ============================== MENU LOGIN ==============================
@@ -359,8 +476,10 @@ public class CodeSavanna {
         String username, password;
 
         do {
-
-            System.out.println("\n\n-*-*-*-*-*- MENU LOGIN -*-*-*-*-*-");
+            System.out.println("╔════════════════════════════════════════════════════════════╗");
+            System.out.println("║                       CODE SAVANNA                         ║");
+            System.out.println("╚════════════════════════════════════════════════════════════╝");
+            System.out.println("-*-*-*-*-*- MENU LOGIN -*-*-*-*-*-");
             System.out.println("1. ADMIN");
             System.out.println("2. CLIENTE");
             System.out.println("0. SAIR");
