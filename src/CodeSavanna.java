@@ -423,7 +423,7 @@ public class CodeSavanna {
         System.out.println("============================================================\n");
     }
 
-    // ======================= ADMIN 3 - Receitas por tipo interaçao =======================
+    // ======================= ADMIN 3 - RECEITAS POR TIPO DE INTERAÇÃO =======================
     public static void receitaPorTipoInteracao(String[][] matrizInteracoes) {
 
         double totalVisita = 0;
